@@ -9,6 +9,8 @@ public class TestPhase
     public int number;
     public NumberTest numberTest;
 
+    public Area area;
+
     public Verdict verdict;
 
     Structure structure;
@@ -37,10 +39,10 @@ public class TestPhase
 
     public void Update() {
         // @Hardcoded
-        if (Time.time - beginTimestamp > 10) {
-            verdict = Verdict.TIME_OVER;
-            return;
-        }
+        // if (Time.time - beginTimestamp > 10) {
+        //     verdict = Verdict.TIME_OVER;
+        //     return;
+        // }
 
         if (type == TestType.ROLL) {
             if (Time.time - beginTimestamp > 1f) {
@@ -62,9 +64,12 @@ public class TestPhase
             if (Time.time - lastTransformUpdatedAt > 1f) {
                 int sum = structure.GetSum();
                 if (
-                    numberTest == NumberTest.EQUAL && number == sum
-                    || numberTest == NumberTest.GEQUAL && sum >= number
-                    || numberTest == NumberTest.LEQUAL && sum <= number
+                    (
+                        numberTest == NumberTest.EQUAL && number == sum
+                        || numberTest == NumberTest.GEQUAL && sum >= number
+                        || numberTest == NumberTest.LEQUAL && sum <= number
+                    )
+                    && (area == null || area.HasEntered())
                 ) {
                     verdict = Verdict.ACCEPTED;
                 }

@@ -9,7 +9,9 @@ public class Structure : MonoBehaviour
 
     Dictionary<Vector3Int, Part> parts = new Dictionary<Vector3Int, Part>();
 
-    Rigidbody rigid;
+    List<Part> permanentParts = new List<Part>();
+
+    public Rigidbody rigid { get; private set; }
 
     void Awake() {
         rigid = GetComponent<Rigidbody>();
@@ -20,24 +22,52 @@ public class Structure : MonoBehaviour
             Transform child = transform.GetChild(i);
             Vector3Int pos = Vector3Int.RoundToInt(child.localPosition);
 
-            AddPart(pos, child.GetComponent<Part>());
+            AddPart(pos, child.GetComponent<Part>(), true);
         }
     }
 
-    public void AddPart(Vector3Int pos, Part part) {
+    public void AddPart(Vector3Int pos, Part part, bool permanent = false) {
         part.transform.parent = transform;
         part.transform.localPosition = pos;
 
         // @Todo: Check bounds
         parts.Add(new Vector3Int(pos.x, pos.y, pos.z), part);
+
+        if (permanent) {
+            permanentParts.Add(part);
+        }
     }
 
-    public void RemovePart(GameObject part) {
+    public bool CanRemove(Part part) {
+        return !permanentParts.Contains(part);
+    }
+
+    public void RemovePart(Part part) {
         parts.Remove(Vector3Int.RoundToInt(part.transform.localPosition));
+
+        Destroy(part.gameObject);
+        permanentParts.Remove(part);
+    }
+
+    public void MovePart(Part part, Vector3Int pos) {
+        if (parts.ContainsKey(pos)) return;
+        parts.Remove(Vector3Int.RoundToInt(part.transform.localPosition));
+
+        part.transform.localPosition = pos;
+        parts[pos] = part;
+    }
+
+    public Part GetPartAt(Vector3Int pos) {
+        if (parts.ContainsKey(pos)) return parts[pos];
+        return null;
     }
 
     public Vector3 GetWorldPos(Vector3Int localPos) {
         return transform.position + localPos;
+    }
+
+    public Vector3Int GetLocalPos(Vector3 worldPos) {
+        return Vector3Int.RoundToInt(worldPos - transform.position);
     }
 
     public bool CanAttach(Vector3Int pos, Part part) {
@@ -51,6 +81,10 @@ public class Structure : MonoBehaviour
         }
 
         return false;
+    }
+
+    public bool IsOccupied(Vector3Int pos) {
+        return parts.ContainsKey(pos);
     }
 
     void Start() {

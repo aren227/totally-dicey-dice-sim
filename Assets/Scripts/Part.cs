@@ -24,7 +24,20 @@ public class Part : MonoBehaviour
     public bool frontOpaque = true;
     public bool backOpaque = true;
 
+    public Side ToLocal(Side side) {
+        Vector3Int v = side.GetVector();
+        Vector3 rot = Quaternion.Inverse(transform.localRotation) * v;
+        return SideExtensions.GetSide(Vector3Int.RoundToInt(rot));
+    }
+
+    public Side ToGlobal(Side side) {
+        Vector3Int v = side.GetVector();
+        Vector3 rot = transform.localRotation * v;
+        return SideExtensions.GetSide(Vector3Int.RoundToInt(rot));
+    }
+
     public bool CanAttach(Side side) {
+        side = ToLocal(side);
         if (side == Side.UP) return upAttachable;
         if (side == Side.DOWN) return downAttachable;
         if (side == Side.LEFT) return leftAttachable;
@@ -34,6 +47,7 @@ public class Part : MonoBehaviour
     }
 
     public bool IsOpaque(Side side) {
+        side = ToLocal(side);
         if (side == Side.UP) return upOpaque;
         if (side == Side.DOWN) return downOpaque;
         if (side == Side.LEFT) return leftOpaque;

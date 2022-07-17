@@ -4,26 +4,34 @@ using UnityEngine;
 
 public class Dice : MonoBehaviour
 {
-    public Structure structure;
+    Structure structure;
+    Part part;
+
+    void Awake() {
+        structure = FindObjectOfType<Structure>();
+        part = GetComponent<Part>();
+    }
 
     public int GetNumber() {
-        float[] dot = new float[6];
-        dot[0] = Vector3.Dot(transform.rotation * Vector3.down, Vector3.up);
-        dot[1] = Vector3.Dot(transform.rotation * Vector3.right, Vector3.up);
-        dot[2] = Vector3.Dot(transform.rotation * Vector3.back, Vector3.up);
-        dot[3] = Vector3.Dot(transform.rotation * Vector3.forward, Vector3.up);
-        dot[4] = Vector3.Dot(transform.rotation * Vector3.left, Vector3.up);
-        dot[5] = Vector3.Dot(transform.rotation * Vector3.up, Vector3.up);
-
         int maxDot = 0;
         float max = float.NegativeInfinity;
         for (int i = 0; i < 6; i++) {
-            if (max < dot[i]) {
-                max = dot[i];
+            Side side = (Side) i;
+            float d = Vector3.Dot(transform.rotation * side.GetVector(), Vector3.up);
+            if (max < d) {
+                max = d;
                 maxDot = i;
             }
         }
 
-        return maxDot+1;
+        Side globalSide = part.ToGlobal((Side) maxDot);
+
+        Part adjPart = structure.GetPartAt(Vector3Int.RoundToInt(transform.localPosition) + globalSide.GetVector());
+        if (adjPart != null && adjPart.IsOpaque(globalSide.GetOpposite())) {
+            return 0;
+        }
+
+        int[] nums = new int[] { 6, 1, 5, 2, 4, 3 };
+        return nums[maxDot];
     }
 }

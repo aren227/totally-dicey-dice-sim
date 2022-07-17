@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6042717237327175971}
   - component: {fileID: 6042717237327175968}
   - component: {fileID: 341470542510589977}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Metal Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}

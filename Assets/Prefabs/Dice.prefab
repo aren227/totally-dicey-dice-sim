@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2393954977194295068}
   - component: {fileID: 6481378274044516713}
   - component: {fileID: 6747442451384826597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Dice
   m_TagString: Untagged
   m_Icon: {fileID: 0}

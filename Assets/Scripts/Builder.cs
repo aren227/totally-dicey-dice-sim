@@ -6,6 +6,7 @@ public class Builder : MonoBehaviour
 {
     Dictionary<string, int> inventory = new Dictionary<string, int>();
 
+    GameManager gameManager;
     Structure structure;
 
     string selectedName;
@@ -21,18 +22,25 @@ public class Builder : MonoBehaviour
     const float maxCamSpeed = 15;
     const float mouseSensitivity = 3;
 
+    Gizmo gizmo;
+
     void Awake() {
+        gameManager = FindObjectOfType<GameManager>();
         structure = FindObjectOfType<Structure>();
 
         selectedName = null;
     }
 
     void Start() {
-        inventory.Add("dice", 10);
-        inventory.Add("metal_frame", 10);
-        inventory.Add("sphere_frame", 10);
-        inventory.Add("jelly", 10);
-        inventory.Add("box", 10);
+        AddItem("dice", 10);
+        AddItem("metal_frame", 10);
+        AddItem("sphere_frame", 10);
+        AddItem("jelly", 10);
+        AddItem("box", 10);
+        AddItem("thruster", 20);
+
+        gizmo = Instantiate(PrefabRegistry.Instance.gizmos).GetComponent<Gizmo>();
+        gizmo.gameObject.SetActive(false);
     }
 
     public void AddItem(string name, int amount) {
@@ -40,9 +48,24 @@ public class Builder : MonoBehaviour
             inventory[name] = 0;
         }
         inventory[name] = inventory[name] + amount;
+
+        FindObjectOfType<CanvasManager>().UpdateInventory(inventory);
     }
 
-    void SelectItem(string name) {
+    public void RemoveItem(string name, int amount) {
+        if (!inventory.ContainsKey(name)) return;
+
+        inventory[name] = Mathf.Max(inventory[name] - amount, 0);
+
+        FindObjectOfType<CanvasManager>().UpdateInventory(inventory);
+    }
+
+    public void SelectItem(string name) {
+        if (name == null) {
+            selectedName = null;
+            return;
+        }
+
         if (!inventory.ContainsKey(name) || inventory[name] <= 0) return;
 
         selectedName = name;
@@ -79,7 +102,11 @@ public class Builder : MonoBehaviour
     }
 
     void Update() {
+        isFreeCam = Input.GetMouseButton(1) || gameManager.state != GameState.BUILD;
+
         if (isFreeCam) {
+            Cursor.lockState = CursorLockMode.Locked;
+
             Transform camTransform = Camera.main.transform;
 
             Vector3 dir = Vector3.zero;
@@ -87,6 +114,10 @@ public class Builder : MonoBehaviour
             if (Input.GetKey(KeyCode.S)) dir += Vector3.back;
             if (Input.GetKey(KeyCode.A)) dir += Vector3.left;
             if (Input.GetKey(KeyCode.D)) dir += Vector3.right;
+            dir.Normalize();
+
+            if (Input.GetKey(KeyCode.Q)) dir += Vector3.up;
+            if (Input.GetKey(KeyCode.E)) dir += Vector3.down;
 
             float targetSpeed = 0;
             if (dir.sqrMagnitude > 0) {
@@ -95,7 +126,7 @@ public class Builder : MonoBehaviour
 
             camSpeed = Mathf.SmoothDamp(camSpeed, targetSpeed, ref camSpeedVel, 0.2f);
 
-            dir = camTransform.rotation * dir.normalized;
+            dir = (camTransform.rotation * dir.normalized) * dir.magnitude;
 
             Vector3 delta = dir * camSpeed * Time.deltaTime;
 
@@ -107,13 +138,13 @@ public class Builder : MonoBehaviour
 
             camTransform.eulerAngles = angles;
 
-            if (Input.GetKeyDown(KeyCode.V)) {
-                isFreeCam = false;
-
-                Cursor.lockState = CursorLockMode.None;
-            }
+            RemovePreviewObject();
+            gizmo.SetTarget(null);
+            gizmo.gameObject.SetActive(false);
         }
         else {
+            Cursor.lockState = CursorLockMode.None;
+
             if (Input.GetKeyDown(KeyCode.Alpha1)) {
                 SelectItem("dice");
             }
@@ -129,8 +160,33 @@ public class Builder : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha5)) {
                 SelectItem("box");
             }
+            if (Input.GetKeyDown(KeyCode.Alpha6)) {
+                SelectItem("thruster");
+            }
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                SelectItem(null);
+            }
 
-            if (selectedName != null) {
+            if (Input.GetKey(KeyCode.LeftShift)) {
+                // Delete
+                RemovePreviewObject();
+
+                Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+                if (Physics.Raycast(mouseRay, out hit, 1000) && hit.collider.GetComponentInParent<Part>()) {
+                    Part part = hit.collider.GetComponentInParent<Part>();
+
+                    Vector3Int pos = part.pos;
+                    Vector3Int dir = Vector3Int.RoundToInt(hit.normal);
+
+                    if (Input.GetMouseButtonDown(0)) {
+                        if (structure.CanRemove(part)) {
+                            structure.RemovePart(part);
+                        }
+                    }
+                }
+            }
+            else if (selectedName != null) {
                 Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(mouseRay, out hit, 1000) && hit.collider.GetComponentInParent<Part>()) {
@@ -145,8 +201,8 @@ public class Builder : MonoBehaviour
 
                     previewObject.transform.position = structure.GetWorldPos(pos + dir);
 
-                    if (avail) {
-                        if (Input.GetMouseButtonDown(0)) {
+                    if (Input.GetMouseButtonDown(0)) {
+                        if (avail) {
                             GameObject cloned = Instantiate(PrefabRegistry.Instance.parts[selectedName].gameObject);
                             structure.AddPart(pos+dir, cloned.GetComponent<Part>());
                         }
@@ -155,17 +211,36 @@ public class Builder : MonoBehaviour
                 else {
                     RemovePreviewObject();
                 }
+
+                gizmo.SetTarget(null);
+                gizmo.gameObject.SetActive(false);
             }
             else {
                 RemovePreviewObject();
-            }
 
-            if (Input.GetKeyDown(KeyCode.V)) {
-                isFreeCam = true;
+                if (Input.GetMouseButtonDown(0)) {
+                    Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if (Physics.Raycast(mouseRay, out hit, 1000) && hit.collider.GetComponentInParent<Part>()) {
+                        Part part = hit.collider.GetComponentInParent<Part>();
 
-                Cursor.lockState = CursorLockMode.Locked;
+                        gizmo.gameObject.SetActive(true);
+                        gizmo.SetTarget(part.transform);
+                    }
+                }
 
-                RemovePreviewObject();
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    gizmo.SetTarget(null);
+                    gizmo.gameObject.SetActive(false);
+                }
+
+                if (gizmo.gameObject.activeSelf && gizmo.target && gizmo.target.GetComponent<Part>()) {
+                    Part part = gizmo.target.GetComponent<Part>();
+
+                    structure.MovePart(part, structure.GetLocalPos(gizmo.targetPosition));
+
+                    part.transform.localRotation = gizmo.targetRotation;
+                }
             }
         }
     }

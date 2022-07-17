@@ -8,10 +8,17 @@ public class PrefabRegistry : MonoBehaviour
 
     public List<GameObject> partObjects;
 
+    public GameObject gizmos;
+
+    public GameObject arrowUi;
+    public GameObject diceUi;
+    public GameObject itemUi;
+
     public Dictionary<string, Part> parts { get; private set; }
 
     public Material availMat;
     public Material notAvailMat;
+    public Material particleMat;
 
     void Awake() {
         Instance = this;
