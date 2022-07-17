@@ -623,6 +623,7 @@ MonoBehaviour:
   buildInventoryBg: {fileID: 1873472599}
   testResultBg: {fileID: 1466262178}
   testStateBg: {fileID: 1269500714}
+  buildTipText: {fileID: 895279719}
   numberText: {fileID: 142952767}
 --- !u!1 &1811396904
 GameObject:

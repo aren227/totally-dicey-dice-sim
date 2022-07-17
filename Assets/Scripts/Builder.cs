@@ -9,7 +9,7 @@ public class Builder : MonoBehaviour
     GameManager gameManager;
     Structure structure;
 
-    string selectedName;
+    public string selectedName { get; private set; }
 
     string previewSelectedName;
     bool previewAvail;
@@ -32,12 +32,10 @@ public class Builder : MonoBehaviour
     }
 
     void Start() {
-        AddItem("dice", 10);
-        AddItem("metal_frame", 10);
-        AddItem("sphere_frame", 10);
-        AddItem("jelly", 10);
-        AddItem("box", 10);
-        AddItem("thruster", 20);
+        LevelInfo levelInfo = FindObjectOfType<LevelInfo>();
+        foreach (ItemWithAmount item in levelInfo.items) {
+            AddItem(item.itemName, item.amount);
+        }
 
         gizmo = Instantiate(PrefabRegistry.Instance.gizmos).GetComponent<Gizmo>();
         gizmo.gameObject.SetActive(false);
@@ -145,24 +143,25 @@ public class Builder : MonoBehaviour
         else {
             Cursor.lockState = CursorLockMode.None;
 
-            if (Input.GetKeyDown(KeyCode.Alpha1)) {
-                SelectItem("dice");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2)) {
-                SelectItem("metal_frame");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3)) {
-                SelectItem("sphere_frame");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4)) {
-                SelectItem("jelly");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha5)) {
-                SelectItem("box");
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha6)) {
-                SelectItem("thruster");
-            }
+            // if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            //     SelectItem("dice");
+            // }
+            // if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            //     SelectItem("metal_frame");
+            // }
+            // if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            //     SelectItem("sphere_frame");
+            // }
+            // if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            //     SelectItem("jelly");
+            // }
+            // if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            //     SelectItem("box");
+            // }
+            // if (Input.GetKeyDown(KeyCode.Alpha6)) {
+            //     SelectItem("thruster");
+            // }
+
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 SelectItem(null);
             }
@@ -182,6 +181,8 @@ public class Builder : MonoBehaviour
                     if (Input.GetMouseButtonDown(0)) {
                         if (structure.CanRemove(part)) {
                             structure.RemovePart(part);
+
+                            AddItem(selectedName, 1);
                         }
                     }
                 }
@@ -205,6 +206,8 @@ public class Builder : MonoBehaviour
                         if (avail) {
                             GameObject cloned = Instantiate(PrefabRegistry.Instance.parts[selectedName].gameObject);
                             structure.AddPart(pos+dir, cloned.GetComponent<Part>());
+
+                            RemoveItem(selectedName, 1);
                         }
                     }
                 }

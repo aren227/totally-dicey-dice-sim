@@ -9,6 +9,6 @@ public class LevelInfo : MonoBehaviour
 
 [System.Serializable]
 public class ItemWithAmount {
-    string itemName;
-    int amount;
+    public string itemName;
+    public int amount;
 }

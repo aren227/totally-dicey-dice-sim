@@ -11,7 +11,8 @@ public class DiceUi : MonoBehaviour
             transform.GetChild(number-1).gameObject.SetActive(true);
         }
         else {
-            transform.GetChild(number).GetComponent<Text>().text = number.ToString();
+            transform.GetChild(6).gameObject.SetActive(true);
+            transform.GetChild(6).GetComponent<Text>().text = number.ToString();
         }
     }
 }

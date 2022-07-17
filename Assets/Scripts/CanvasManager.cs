@@ -15,6 +15,8 @@ public class CanvasManager : MonoBehaviour
     public GameObject testResultBg;
     public GameObject testStateBg;
 
+    public Text buildTipText;
+
     public Text numberText;
 
     List<GameObject> phaseIcons = new List<GameObject>();
@@ -23,6 +25,7 @@ public class CanvasManager : MonoBehaviour
     Structure structure;
     Tester tester;
     TestResultUi testResultUi;
+    Builder builder;
 
     Dictionary<string, GameObject> itemIcons = new Dictionary<string, GameObject>();
 
@@ -31,6 +34,7 @@ public class CanvasManager : MonoBehaviour
         tester = FindObjectOfType<Tester>();
         testResultUi = FindObjectOfType<TestResultUi>();
         structure = FindObjectOfType<Structure>();
+        builder = FindObjectOfType<Builder>();
     }
 
     void Start() {
@@ -139,6 +143,19 @@ public class CanvasManager : MonoBehaviour
             else {
                 testResultUi.SetText("Failed!", "");
             }
+        }
+
+        if (gameManager.state == GameState.BUILD) {
+            string baseText = "[Space] Enter test mode";
+
+            if (builder.selectedName != null) {
+                baseText += "\n[LMB] Place blocks\n[Shift+LMB] Remove blocks\n[Esc] Deselect";
+            }
+            else {
+                baseText += "\n[LMB] Move/Rotate blocks";
+            }
+
+            buildTipText.text = baseText;
         }
     }
 }
