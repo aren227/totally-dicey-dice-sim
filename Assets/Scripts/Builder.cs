@@ -16,6 +16,11 @@ public class Builder : MonoBehaviour
 
     bool isFreeCam = false;
 
+    float camSpeed = 0;
+    float camSpeedVel = 0;
+    const float maxCamSpeed = 15;
+    const float mouseSensitivity = 3;
+
     void Awake() {
         structure = FindObjectOfType<Structure>();
 
@@ -25,6 +30,9 @@ public class Builder : MonoBehaviour
     void Start() {
         inventory.Add("dice", 10);
         inventory.Add("metal_frame", 10);
+        inventory.Add("sphere_frame", 10);
+        inventory.Add("jelly", 10);
+        inventory.Add("box", 10);
     }
 
     public void AddItem(string name, int amount) {
@@ -72,7 +80,38 @@ public class Builder : MonoBehaviour
 
     void Update() {
         if (isFreeCam) {
-            // @Todo
+            Transform camTransform = Camera.main.transform;
+
+            Vector3 dir = Vector3.zero;
+            if (Input.GetKey(KeyCode.W)) dir += Vector3.forward;
+            if (Input.GetKey(KeyCode.S)) dir += Vector3.back;
+            if (Input.GetKey(KeyCode.A)) dir += Vector3.left;
+            if (Input.GetKey(KeyCode.D)) dir += Vector3.right;
+
+            float targetSpeed = 0;
+            if (dir.sqrMagnitude > 0) {
+                targetSpeed = maxCamSpeed;
+            }
+
+            camSpeed = Mathf.SmoothDamp(camSpeed, targetSpeed, ref camSpeedVel, 0.2f);
+
+            dir = camTransform.rotation * dir.normalized;
+
+            Vector3 delta = dir * camSpeed * Time.deltaTime;
+
+            camTransform.position = camTransform.position + delta;
+
+            Vector3 angles = camTransform.eulerAngles;
+            angles.y += Input.GetAxis("Mouse X") * mouseSensitivity;
+            angles.x = angles.x -Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+            camTransform.eulerAngles = angles;
+
+            if (Input.GetKeyDown(KeyCode.V)) {
+                isFreeCam = false;
+
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
         else {
             if (Input.GetKeyDown(KeyCode.Alpha1)) {
@@ -80,6 +119,15 @@ public class Builder : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Alpha2)) {
                 SelectItem("metal_frame");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3)) {
+                SelectItem("sphere_frame");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4)) {
+                SelectItem("jelly");
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha5)) {
+                SelectItem("box");
             }
 
             if (selectedName != null) {
@@ -109,6 +157,14 @@ public class Builder : MonoBehaviour
                 }
             }
             else {
+                RemovePreviewObject();
+            }
+
+            if (Input.GetKeyDown(KeyCode.V)) {
+                isFreeCam = true;
+
+                Cursor.lockState = CursorLockMode.Locked;
+
                 RemovePreviewObject();
             }
         }

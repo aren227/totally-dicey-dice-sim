@@ -59,6 +59,15 @@ public class Structure : MonoBehaviour
 
     public void BeginTest() {
         rigid.isKinematic = false;
+
+        Vector3 centerOfMass = Vector3.zero;
+        float sum = 0;
+        foreach (Part part in parts.Values) {
+            centerOfMass += part.transform.localPosition * part.mass;
+            sum += part.mass;
+        }
+
+        rigid.centerOfMass = centerOfMass / sum;
     }
 
     public void EndTest(Vector3 moveTo) {
@@ -81,7 +90,7 @@ public class Structure : MonoBehaviour
     public void Throw() {
         transform.localEulerAngles = new Vector3(Random.Range(-360f, 360f), Random.Range(-360f, 360f), Random.Range(-360f, 360f));
 
-        rigid.AddForce(Vector3.up * 10, ForceMode.VelocityChange);
-        rigid.AddTorque(Random.onUnitSphere * 10, ForceMode.VelocityChange);
+        rigid.AddForce(Vector3.up * 20, ForceMode.Impulse);
+        rigid.AddTorque(Random.onUnitSphere * 20, ForceMode.Impulse);
     }
 }

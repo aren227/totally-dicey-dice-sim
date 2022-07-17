@@ -74,6 +74,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   partName: dice
+  mass: 1
   upAttachable: 1
   downAttachable: 1
   leftAttachable: 1

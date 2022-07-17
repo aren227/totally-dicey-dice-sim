@@ -6,6 +6,8 @@ public class Part : MonoBehaviour
 {
     public string partName;
 
+    public float mass;
+
     public Vector3Int pos => Vector3Int.RoundToInt(transform.localPosition);
 
     public bool upAttachable = true;
