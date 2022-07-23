@@ -138,7 +138,7 @@ public class CanvasManager : MonoBehaviour
 
         if (gameManager.state == GameState.TEST_DONE) {
             if (tester.verdict == Verdict.ACCEPTED) {
-                testResultUi.SetText("Solved!", "");
+                testResultUi.SetText("Solved!", "Press [X] to go to the next level.");
             }
             else {
                 testResultUi.SetText("Failed!", "");
@@ -146,7 +146,7 @@ public class CanvasManager : MonoBehaviour
         }
 
         if (gameManager.state == GameState.BUILD) {
-            string baseText = "[Space] Enter test mode";
+            string baseText = "[Space] Enter test mode\n[R] Reset camera";
 
             if (builder.selectedName != null) {
                 baseText += "\n[LMB] Place blocks\n[Shift+LMB] Remove blocks\n[Esc] Deselect";

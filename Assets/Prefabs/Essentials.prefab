@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 123
+  m_Text: 
 --- !u!1 &818668876
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,7 +196,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '[Space] Enter test mode'
+  m_Text: '[Space] Enter test mode
+
+    [R] Reset camera'
 --- !u!1 &923903859
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +278,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Reason
+  m_Text: '
 
 '
 --- !u!1 &1230039455
@@ -478,7 +480,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -100}
-  m_SizeDelta: {x: 600, y: 300}
+  m_SizeDelta: {x: 800, y: 300}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1466262180
 MonoBehaviour:
@@ -830,7 +832,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '[Space] Leave test mode'
+  m_Text: '[Space] Leave test mode
+
+    [R] Reset camera'
 --- !u!1 &1952253292
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,7 +914,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: RESULT
+  m_Text: 
 --- !u!1 &2125792191
 GameObject:
   m_ObjectHideFlags: 0

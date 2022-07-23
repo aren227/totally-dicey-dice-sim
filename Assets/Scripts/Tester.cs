@@ -30,6 +30,11 @@ public class Tester : MonoBehaviour
     }
 
     public void EndTest() {
+        verdict = Verdict.WAITING;
+        foreach (TestPhase testPhase in testPhases) {
+            testPhase.verdict = Verdict.WAITING;
+        }
+
         Debug.Log("End test phases");
     }
 

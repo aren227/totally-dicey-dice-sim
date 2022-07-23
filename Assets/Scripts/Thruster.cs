@@ -26,8 +26,8 @@ public class Thruster : MonoBehaviour
     }
 
     void Update() {
-        if (Input.GetKey(KeyCode.Q) && !on) TurnOn();
-        else if (!Input.GetKey(KeyCode.Q) && on) TurnOff();
+        if (Input.GetKey(KeyCode.Z) && !on) TurnOn();
+        else if (!Input.GetKey(KeyCode.Z) && on) TurnOff();
     }
 
     void FixedUpdate()

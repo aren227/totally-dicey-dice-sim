@@ -21,6 +21,8 @@ public class TestPhase
     Vector3 lastPosition;
     Vector3 lastAngles;
 
+    bool hasThrusters;
+
     public void Begin(Structure structure) {
         this.structure = structure;
 
@@ -35,6 +37,8 @@ public class TestPhase
         if (type == TestType.ROLL) {
             structure.Throw();
         }
+
+        hasThrusters = GameObject.FindObjectOfType<Thruster>() != null;
     }
 
     public void Update() {
@@ -45,7 +49,7 @@ public class TestPhase
         // }
 
         if (type == TestType.ROLL) {
-            if (Time.time - beginTimestamp > 1f) {
+            if (Time.time - beginTimestamp > 0.5f) {
                 verdict = Verdict.ACCEPTED;
             }
         }
@@ -73,7 +77,7 @@ public class TestPhase
                 ) {
                     verdict = Verdict.ACCEPTED;
                 }
-                else {
+                else if (!hasThrusters) {
                     verdict = Verdict.FAILED;
                 }
                 return;
